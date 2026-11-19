@@ -428,7 +428,7 @@
             const { error } = await db.from('stroop_experiment').insert([payload]);
 
             if (error) {
-                statusEl.innerText = 'Fel vid sparning (' + error.message + '). Ta en skärmdump nedan!';
+                statusEl.innerText = 'Fel vid sparning (' + error.message + '). Ta en skärmdump nedan! (' + err.message + ')';
                 statusEl.style.color = '#dc2626';
             } else {
                 statusEl.innerText = '✓ Dina resultat har sparats i databasen!';
