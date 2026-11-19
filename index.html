@@ -30,7 +30,6 @@
         h1 { font-size: 1.8rem; margin: 0 0 12px 0; }
         h2 { font-size: 1.5rem; margin: 0 0 12px 0; }
         p { font-size: 1.05rem; line-height: 1.6; color: #334155; }
-        
         .id-pill {
             display: inline-block;
             background: #eff6ff;
@@ -43,7 +42,6 @@
             border-radius: 8px;
             margin: 12px 0 20px 0;
         }
-
         .btn {
             background-color: #2563eb;
             color: #ffffff;
@@ -56,7 +54,6 @@
             transition: background-color 0.15s;
         }
         .btn:hover { background-color: #1d4ed8; }
-
         .progress-bar {
             width: 100%;
             height: 8px;
@@ -71,34 +68,10 @@
             width: 100%;
             transition: width 1s linear;
         }
-
-        .timer-text {
-            font-size: 1rem;
-            font-weight: 600;
-            color: #64748b;
-            margin-bottom: 10px;
-        }
-
-        .stimulus-box {
-            height: 130px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 20px 0;
-        }
-        .stimulus-word {
-            font-size: 4.2rem;
-            font-weight: 800;
-            letter-spacing: 2px;
-            user-select: none;
-        }
-
-        .grid-buttons {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 14px;
-            margin-top: 10px;
-        }
+        .timer-text { font-size: 1rem; font-weight: 600; color: #64748b; margin-bottom: 10px; }
+        .stimulus-box { height: 130px; display: flex; align-items: center; justify-content: center; margin: 20px 0; }
+        .stimulus-word { font-size: 4.2rem; font-weight: 800; letter-spacing: 2px; user-select: none; }
+        .grid-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 10px; }
         .color-btn {
             padding: 18px;
             font-size: 1.2rem;
@@ -112,20 +85,9 @@
         }
         .color-btn:hover { background: #f8fafc; border-color: #94a3b8; }
         .color-btn:active { transform: scale(0.97); }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            font-size: 0.95rem;
-        }
-        th, td {
-            border: 1px solid #e2e8f0;
-            padding: 10px;
-            text-align: center;
-        }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 0.95rem; }
+        th, td { border: 1px solid #e2e8f0; padding: 10px; text-align: center; }
         th { background-color: #f8fafc; font-weight: 600; }
-
         .stroop-card {
             background: #f8fafc;
             border: 1px solid #cbd5e1;
@@ -136,11 +98,7 @@
             font-size: 0.98rem;
             line-height: 1.6;
         }
-
-        .status-msg {
-            font-weight: 600;
-            margin-top: 12px;
-        }
+        .status-msg { font-weight: 600; margin-top: 12px; }
         .hidden { display: none; }
     </style>
 </head>
@@ -152,16 +110,16 @@
         <h1>Stroop-test (6 delar)</h1>
         <p>Testet tar cirka 4–5 minuter totalt och består av 6 korta delar på 30 sekunder vardera. Läs instruktionerna noga inför varje del.</p>
         <div>Ditt unika anonyma deltagar-ID:</div>
-        <div class="id-pill" id="start-id-display"></div>
+        <div class="id-pill" id="start-id-display">Laddar ID...</div>
         <br>
-        <button class="btn" onclick="goToInstructions()">Starta testet</button>
+        <button type="button" class="btn" id="btn-start">Starta testet</button>
     </div>
 
     <!-- 2. INSTRUCTION SCREEN -->
     <div id="screen-instructions" class="hidden">
         <h2 id="inst-header"></h2>
         <p id="inst-body" style="margin: 24px 0;"></p>
-        <button class="btn" onclick="startTrialSection()">Jag har läst instruktionerna – Starta</button>
+        <button type="button" class="btn" id="btn-begin-section">Jag har läst instruktionerna – Starta</button>
     </div>
 
     <!-- 3. GAMEPLAY SCREEN -->
@@ -174,10 +132,10 @@
         </div>
 
         <div class="grid-buttons">
-            <button class="color-btn" onclick="submitAnswer('RÖD')">RÖD</button>
-            <button class="color-btn" onclick="submitAnswer('BLÅ')">BLÅ</button>
-            <button class="color-btn" onclick="submitAnswer('GRÖN')">GRÖN</button>
-            <button class="color-btn" onclick="submitAnswer('GUL')">GUL</button>
+            <button type="button" class="color-btn" data-color="RÖD">RÖD</button>
+            <button type="button" class="color-btn" data-color="BLÅ">BLÅ</button>
+            <button type="button" class="color-btn" data-color="GRÖN">GRÖN</button>
+            <button type="button" class="color-btn" data-color="GUL">GUL</button>
         </div>
     </div>
 
@@ -203,14 +161,12 @@
         <div class="stroop-card" id="stroop-results-box"></div>
     </div>
 </div>
-
 <script>
     // =========================================================
     // 1. SUPABASE CONFIGURATION (REPLACE THESE TWO VALUES)
     // =========================================================
     const SUPABASE_URL = 'https://zxlkowyznexccizdlegu.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_Hic-wK02mlcYwJ63ppXk_Q_-HIc03tB';
-    const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     // =========================================================
     // 2. EXPERIMENT SETTINGS
@@ -227,78 +183,82 @@
     const SECTIONS = [
         {
             num: 1,
-            label: "Konstant färg (Svart)",
-            title: "Del 1 av 6",
-            instruction: "I den här delen är textfärgen alltid <strong>SVART</strong>, medan orden ändras.<br><br>Klicka på knappen som motsvarar <strong>ORDET</strong> som står skrivet.",
-            mode: "constant_color"
+            label: 'Konstant färg (Svart)',
+            title: 'Del 1 av 6',
+            instruction: 'I den här delen är textfärgen alltid <strong>SVART</strong>, medan orden ändras.<br><br>Klicka på knappen som motsvarar <strong>ORDET</strong> som står skrivet.',
+            mode: 'constant_color'
         },
         {
             num: 2,
-            label: "Konstant ord ('FÄRG')",
-            title: "Del 2 av 6",
-            instruction: "I den här delen står det alltid ordet <strong>FÄRG</strong>, medan textfärgen ändras.<br><br>Klicka på knappen som motsvarar <strong>TEXTFÄRGEN</strong>.",
-            mode: "constant_word"
+            label: 'Konstant ord (FÄRG)',
+            title: 'Del 2 av 6',
+            instruction: 'I den här delen står det alltid ordet <strong>FÄRG</strong>, medan textfärgen ändras.<br><br>Klicka på knappen som motsvarar <strong>TEXTFÄRGEN</strong>.',
+            mode: 'constant_word'
         },
         {
             num: 3,
-            label: "Kongruent 1",
-            title: "Del 3 av 6",
-            instruction: "Nu stämmer ordet och textfärgen överens (t.ex. ordet RÖD skrivet i röd färg).<br><br>Klicka på knappen som motsvarar <strong>TEXTFÄRGEN</strong>.",
-            mode: "congruent"
+            label: 'Kongruent 1',
+            title: 'Del 3 av 6',
+            instruction: 'Nu stämmer ordet och textfärgen överens (t.ex. ordet RÖD skrivet i röd färg).<br><br>Klicka på knappen som motsvarar <strong>TEXTFÄRGEN</strong>.',
+            mode: 'congruent'
         },
         {
             num: 4,
-            label: "Inkongruent 1",
-            title: "Del 4 av 6",
-            instruction: "Nu stämmer ordet och textfärgen <strong>INTE</strong> överens (t.ex. ordet RÖD skrivet i blå färg).<br><br>Ignorera vad det står och klicka på <strong>TEXTFÄRGEN</strong>.",
-            mode: "incongruent"
+            label: 'Inkongruent 1',
+            title: 'Del 4 av 6',
+            instruction: 'Nu stämmer ordet och textfärgen <strong>INTE</strong> överens (t.ex. ordet RÖD skrivet i blå färg).<br><br>Ignorera vad det står och klicka på <strong>TEXTFÄRGEN</strong>.',
+            mode: 'incongruent'
         },
         {
             num: 5,
-            label: "Kongruent 2",
-            title: "Del 5 av 6",
-            instruction: "Precis som i del 3 stämmer ordet och textfärgen nu överens igen.<br><br>Klicka på knappen som motsvarar <strong>TEXTFÄRGEN</strong>.",
-            mode: "congruent"
+            label: 'Kongruent 2',
+            title: 'Del 5 av 6',
+            instruction: 'Precis som i del 3 stämmer ordet och textfärgen nu överens igen.<br><br>Klicka på knappen som motsvarar <strong>TEXTFÄRGEN</strong>.',
+            mode: 'congruent'
         },
         {
             num: 6,
-            label: "Inkongruent 2",
-            title: "Del 6 av 6",
-            instruction: "Sista delen! Precis som i del 4 stämmer ordet och textfärgen <strong>INTE</strong> överens.<br><br>Ignorera ordet och klicka på <strong>TEXTFÄRGEN</strong>.",
-            mode: "incongruent"
+            label: 'Inkongruent 2',
+            title: 'Del 6 av 6',
+            instruction: 'Sista delen! Precis som i del 4 stämmer ordet och textfärgen <strong>INTE</strong> överens.<br><br>Ignorera ordet och klicka på <strong>TEXTFÄRGEN</strong>.',
+            mode: 'incongruent'
         }
     ];
-
     // =========================================================
-    // 3. UNIQUE ANONYMOUS PARTICIPANT ID
+    // 3. GENERATE PARTICIPANT ID
     // =========================================================
-    function getOrCreateParticipantId() {
-        let pid = sessionStorage.getItem('stroop_pid');
-        if (!pid) {
-            const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
-            const randStr = Math.random().toString(36).substring(2, 7).toUpperCase();
-            pid = `P-${dateStr}-${randStr}`;
-            sessionStorage.setItem('stroop_pid', pid);
+    function getParticipantId() {
+        try {
+            let pid = sessionStorage.getItem('stroop_pid');
+            if (!pid) {
+                const datePart = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+                const randomPart = Math.random().toString(36).substring(2, 7).toUpperCase();
+                pid = 'P-' + datePart + '-' + randomPart;
+                sessionStorage.setItem('stroop_pid', pid);
+            }
+            return pid;
+        } catch (error) {
+            return 'P-' + Math.floor(100000 + Math.random() * 900000);
         }
-        return pid;
     }
 
-    const participantId = getOrCreateParticipantId();
+    const participantId = getParticipantId();
     document.getElementById('start-id-display').innerText = participantId;
 
     // =========================================================
     // 4. GAME ENGINE
     // =========================================================
-let currentIdx = 0;
-    let targetAnswer = "";
-    let lastStimulusSignature = "";
+    let currentIdx = 0;
+    let targetAnswer = '';
+    let lastSignature = '';
     let timerId = null;
-    let secondsRemaining = SECONDS_PER_SECTION;
+    let secondsLeft = SECONDS_PER_SECTION;
     let isRunning = false;
     let scores = {};
 
-    function switchScreen(screenId) {
-        ['screen-start', 'screen-instructions', 'screen-game', 'screen-end'].forEach(id => {
+    function showScreen(screenId) {
+        const screens = ['screen-start', 'screen-instructions', 'screen-game', 'screen-end'];
+        screens.forEach(function(id) {
             document.getElementById(id).classList.add('hidden');
         });
         document.getElementById(screenId).classList.remove('hidden');
@@ -308,32 +268,31 @@ let currentIdx = 0;
         const sec = SECTIONS[currentIdx];
         document.getElementById('inst-header').innerText = sec.title;
         document.getElementById('inst-body').innerHTML = sec.instruction;
-        switchScreen('screen-instructions');
+        showScreen('screen-instructions');
     }
 
-    function startTrialSection() {
+    function startSection() {
         const sec = SECTIONS[currentIdx];
-        scores[`s${sec.num}`] = { answered: 0, correct: 0, incorrect: 0 };
-        lastStimulusSignature = "";
-
-        secondsRemaining = SECONDS_PER_SECTION;
+        scores['s' + sec.num] = { answered: 0, correct: 0, incorrect: 0 };
+        lastSignature = '';
+        secondsLeft = SECONDS_PER_SECTION;
         isRunning = true;
 
         document.getElementById('section-label').innerText = sec.title;
-        document.getElementById('timer-seconds').innerText = secondsRemaining;
+        document.getElementById('timer-seconds').innerText = secondsLeft;
         document.getElementById('progress-fill').style.width = '100%';
 
-        switchScreen('screen-game');
+        showScreen('screen-game');
         nextStimulus();
 
-        timerId = setInterval(() => {
-            secondsRemaining--;
-            document.getElementById('timer-seconds').innerText = secondsRemaining;
-            const pct = (secondsRemaining / SECONDS_PER_SECTION) * 100;
-            document.getElementById('progress-fill').style.width = `${pct}%`;
+        timerId = setInterval(function() {
+            secondsLeft--;
+            document.getElementById('timer-seconds').innerText = secondsLeft;
+            const percent = (secondsLeft / SECONDS_PER_SECTION) * 100;
+            document.getElementById('progress-fill').style.width = percent + '%';
 
-            if (secondsRemaining <= 0) {
-                finishTrialSection();
+            if (secondsLeft <= 0) {
+                endSection();
             }
         }, 1000);
     }
@@ -341,58 +300,63 @@ let currentIdx = 0;
     function nextStimulus() {
         const sec = SECTIONS[currentIdx];
         const wordEl = document.getElementById('stimulus-word');
-        let wordText = "";
-        let fontHex = "";
-        let answer = "";
-        let signature = "";
+        let wordText = '';
+        let fontHex = '';
+        let answer = '';
+        let signature = '';
 
         do {
-            const cObj = COLORS[Math.floor(Math.random() * COLORS.length)];
+            const colorObj = COLORS[Math.floor(Math.random() * COLORS.length)];
 
-            if (sec.mode === "constant_color") {
-                wordText = cObj.name;
-                fontHex = "#0f172a";
-                answer = cObj.name;
-            } else if (sec.mode === "constant_word") {
-                wordText = "FÄRG";
-                fontHex = cObj.hex;
-                answer = cObj.name;
-            } else if (sec.mode === "congruent") {
-                wordText = cObj.name;
-                fontHex = cObj.hex;
-                answer = cObj.name;
-            } else if (sec.mode === "incongruent") {
-                const others = COLORS.filter(c => c.name !== cObj.name);
-                const wObj = others[Math.floor(Math.random() * others.length)];
-                wordText = wObj.name;
-                fontHex = cObj.hex;
-                answer = cObj.name;
+            if (sec.mode === 'constant_color') {
+                wordText = colorObj.name;
+                fontHex = '#0f172a';
+                answer = colorObj.name;
+            } else if (sec.mode === 'constant_word') {
+                wordText = 'FÄRG';
+                fontHex = colorObj.hex;
+                answer = colorObj.name;
+            } else if (sec.mode === 'congruent') {
+                wordText = colorObj.name;
+                fontHex = colorObj.hex;
+                answer = colorObj.name;
+            } else {
+                const otherColors = COLORS.filter(function(item) {
+                    return item.name !== colorObj.name;
+                });
+                const wordObj = otherColors[Math.floor(Math.random() * otherColors.length)];
+                wordText = wordObj.name;
+                fontHex = colorObj.hex;
+                answer = colorObj.name;
             }
-            signature = `${wordText}_${fontHex}`;
-        } while (signature === lastStimulusSignature);
 
-        lastStimulusSignature = signature;
+            signature = wordText + '_' + fontHex;
+        } while (signature === lastSignature);
+
+        lastSignature = signature;
         targetAnswer = answer;
         wordEl.innerText = wordText;
         wordEl.style.color = fontHex;
     }
 
-    function submitAnswer(chosenColor) {
-        if (!isRunning) return;
+    function handleAnswer(chosenColor) {
+        if (!isRunning) {
+            return;
+        }
 
         const secNum = SECTIONS[currentIdx].num;
-        scores[`s${secNum}`].answered++;
+        scores['s' + secNum].answered++;
 
         if (chosenColor === targetAnswer) {
-            scores[`s${secNum}`].correct++;
+            scores['s' + secNum].correct++;
         } else {
-            scores[`s${secNum}`].incorrect++;
+            scores['s' + secNum].incorrect++;
         }
 
         nextStimulus();
     }
 
-    function finishTrialSection() {
+    function endSection() {
         isRunning = false;
         clearInterval(timerId);
         currentIdx++;
@@ -400,62 +364,91 @@ let currentIdx = 0;
         if (currentIdx < SECTIONS.length) {
             goToInstructions();
         } else {
-            completeExperiment();
+            finishExperiment();
         }
     }
-
-    async function completeExperiment() {
-        switchScreen('screen-end');
+    // =========================================================
+    // 5. RESULTS, DATABASE SAVE & BUTTON LISTENERS
+    // =========================================================
+    async function finishExperiment() {
+        showScreen('screen-end');
         document.getElementById('end-id-display').innerText = participantId;
 
-        const stroop3v4 = scores.s3.correct - scores.s4.correct;
-        const stroop5v6 = scores.s5.correct - scores.s6.correct;
+        const stroop3vs4 = scores.s3.correct - scores.s4.correct;
+        const stroop5vs6 = scores.s5.correct - scores.s6.correct;
 
         const tbody = document.getElementById('results-tbody');
-        tbody.innerHTML = "";
-        SECTIONS.forEach(sec => {
-            const s = scores[`s${sec.num}`];
-            tbody.innerHTML += `
-                <tr>
-                    <td><strong>Del ${sec.num}</strong></td>
-                    <td>${sec.label}</td>
-                    <td>${s.answered}</td>
-                    <td style="color:#16a34a; font-weight:bold;">${s.correct}</td>
-                    <td style="color:#dc2626;">${s.incorrect}</td>
-                </tr>
-            `;
+        tbody.innerHTML = '';
+
+        SECTIONS.forEach(function(sec) {
+            const r = scores['s' + sec.num];
+            tbody.innerHTML +=
+                '<tr>' +
+                    '<td><strong>Del ' + sec.num + '</strong></td>' +
+                    '<td>' + sec.label + '</td>' +
+                    '<td>' + r.answered + '</td>' +
+                    '<td style="color:#16a34a;font-weight:700">' + r.correct + '</td>' +
+                    '<td style="color:#dc2626">' + r.incorrect + '</td>' +
+                '</tr>';
         });
 
-        document.getElementById('stroop-results-box').innerHTML = `
-            <strong>Stroop-effekt (Kongruent rätt − Inkongruent rätt):</strong><br>
-            • <strong>Omgång 1 (Del 3 vs Del 4):</strong> ${stroop3v4} poäng (${scores.s3.correct} − ${scores.s4.correct})<br>
-            • <strong>Omgång 2 (Del 5 vs Del 6):</strong> ${stroop5v6} poäng (${scores.s5.correct} − ${scores.s6.correct})
-        `;
+        document.getElementById('stroop-results-box').innerHTML =
+            '<strong>Stroop-effekt (Kongruent rätt − Inkongruent rätt):</strong><br>' +
+            '• <strong>Omgång 1 (Del 3 vs Del 4):</strong> ' + stroop3vs4 + ' poäng (' + scores.s3.correct + ' − ' + scores.s4.correct + ')<br>' +
+            '• <strong>Omgång 2 (Del 5 vs Del 6):</strong> ' + stroop5vs6 + ' poäng (' + scores.s5.correct + ' − ' + scores.s6.correct + ')';
 
-        const record = {
-            participant_id: participantId,
-            s1_answered: scores.s1.answered, s1_correct: scores.s1.correct, s1_incorrect: scores.s1.incorrect,
-            s2_answered: scores.s2.answered, s2_correct: scores.s2.correct, s2_incorrect: scores.s2.incorrect,
-            s3_answered: scores.s3.answered, s3_correct: scores.s3.correct, s3_incorrect: scores.s3.incorrect,
-            s4_answered: scores.s4.answered, s4_correct: scores.s4.correct, s4_incorrect: scores.s4.incorrect,
-            s5_answered: scores.s5.answered, s5_correct: scores.s5.correct, s5_incorrect: scores.s5.incorrect,
-            s6_answered: scores.s6.answered, s6_correct: scores.s6.correct, s6_incorrect: scores.s6.incorrect,
-            stroop_effect_3_vs_4: stroop3v4,
-            stroop_effect_5_vs_6: stroop5v6
-        };
-
-        const { error } = await db.from('stroop_experiment').insert([record]);
         const statusEl = document.getElementById('db-status');
 
-        if (error) {
-            console.error("Supabase error:", error);
-            statusEl.innerText = "Kunde inte spara till databasen. Ta en skärmdump av dina resultat nedan!";
-            statusEl.style.color = "#dc2626";
-        } else {
-            statusEl.innerText = "✓ Dina resultat har sparats i databasen!";
-            statusEl.style.color = "#16a34a";
+        try {
+            const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            const payload = {
+                participant_id: participantId,
+                s1_answered: scores.s1.answered,
+                s1_correct: scores.s1.correct,
+                s1_incorrect: scores.s1.incorrect,
+                s2_answered: scores.s2.answered,
+                s2_correct: scores.s2.correct,
+                s2_incorrect: scores.s2.incorrect,
+                s3_answered: scores.s3.answered,
+                s3_correct: scores.s3.correct,
+                s3_incorrect: scores.s3.incorrect,
+                s4_answered: scores.s4.answered,
+                s4_correct: scores.s4.correct,
+                s4_incorrect: scores.s4.incorrect,
+                s5_answered: scores.s5.answered,
+                s5_correct: scores.s5.correct,
+                s5_incorrect: scores.s5.incorrect,
+                s6_answered: scores.s6.answered,
+                s6_correct: scores.s6.correct,
+                s6_incorrect: scores.s6.incorrect,
+                stroop_effect_3_vs_4: stroop3vs4,
+                stroop_effect_5_vs_6: stroop5vs6
+            };
+
+            const { error } = await db.from('stroop_experiment').insert([payload]);
+
+            if (error) {
+                statusEl.innerText = 'Fel vid sparning (' + error.message + '). Ta en skärmdump nedan!';
+                statusEl.style.color = '#dc2626';
+            } else {
+                statusEl.innerText = '✓ Dina resultat har sparats i databasen!';
+                statusEl.style.color = '#16a34a';
+            }
+        } catch (err) {
+            statusEl.innerText = 'Kunde inte ansluta till databasen. Ta en skärmdump nedan!';
+            statusEl.style.color = '#dc2626';
         }
     }
+
+    document.getElementById('btn-start').addEventListener('click', goToInstructions);
+    document.getElementById('btn-begin-section').addEventListener('click', startSection);
+
+    document.querySelectorAll('.color-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            handleAnswer(btn.getAttribute('data-color'));
+        });
+    });
 </script>
+
 </body>
 </html>
