@@ -289,4 +289,173 @@
     // =========================================================
     // 4. GAME ENGINE
     // =========================================================
+let currentIdx = 0;
+    let targetAnswer = "";
+    let lastStimulusSignature = "";
+    let timerId = null;
+    let secondsRemaining = SECONDS_PER_SECTION;
+    let isRunning = false;
+    let scores = {};
 
+    function switchScreen(screenId) {
+        ['screen-start', 'screen-instructions', 'screen-game', 'screen-end'].forEach(id => {
+            document.getElementById(id).classList.add('hidden');
+        });
+        document.getElementById(screenId).classList.remove('hidden');
+    }
+
+    function goToInstructions() {
+        const sec = SECTIONS[currentIdx];
+        document.getElementById('inst-header').innerText = sec.title;
+        document.getElementById('inst-body').innerHTML = sec.instruction;
+        switchScreen('screen-instructions');
+    }
+
+    function startTrialSection() {
+        const sec = SECTIONS[currentIdx];
+        scores[`s${sec.num}`] = { answered: 0, correct: 0, incorrect: 0 };
+        lastStimulusSignature = "";
+
+        secondsRemaining = SECONDS_PER_SECTION;
+        isRunning = true;
+
+        document.getElementById('section-label').innerText = sec.title;
+        document.getElementById('timer-seconds').innerText = secondsRemaining;
+        document.getElementById('progress-fill').style.width = '100%';
+
+        switchScreen('screen-game');
+        nextStimulus();
+
+        timerId = setInterval(() => {
+            secondsRemaining--;
+            document.getElementById('timer-seconds').innerText = secondsRemaining;
+            const pct = (secondsRemaining / SECONDS_PER_SECTION) * 100;
+            document.getElementById('progress-fill').style.width = `${pct}%`;
+
+            if (secondsRemaining <= 0) {
+                finishTrialSection();
+            }
+        }, 1000);
+    }
+
+    function nextStimulus() {
+        const sec = SECTIONS[currentIdx];
+        const wordEl = document.getElementById('stimulus-word');
+        let wordText = "";
+        let fontHex = "";
+        let answer = "";
+        let signature = "";
+
+        do {
+            const cObj = COLORS[Math.floor(Math.random() * COLORS.length)];
+
+            if (sec.mode === "constant_color") {
+                wordText = cObj.name;
+                fontHex = "#0f172a";
+                answer = cObj.name;
+            } else if (sec.mode === "constant_word") {
+                wordText = "FÄRG";
+                fontHex = cObj.hex;
+                answer = cObj.name;
+            } else if (sec.mode === "congruent") {
+                wordText = cObj.name;
+                fontHex = cObj.hex;
+                answer = cObj.name;
+            } else if (sec.mode === "incongruent") {
+                const others = COLORS.filter(c => c.name !== cObj.name);
+                const wObj = others[Math.floor(Math.random() * others.length)];
+                wordText = wObj.name;
+                fontHex = cObj.hex;
+                answer = cObj.name;
+            }
+            signature = `${wordText}_${fontHex}`;
+        } while (signature === lastStimulusSignature);
+
+        lastStimulusSignature = signature;
+        targetAnswer = answer;
+        wordEl.innerText = wordText;
+        wordEl.style.color = fontHex;
+    }
+
+    function submitAnswer(chosenColor) {
+        if (!isRunning) return;
+
+        const secNum = SECTIONS[currentIdx].num;
+        scores[`s${secNum}`].answered++;
+
+        if (chosenColor === targetAnswer) {
+            scores[`s${secNum}`].correct++;
+        } else {
+            scores[`s${secNum}`].incorrect++;
+        }
+
+        nextStimulus();
+    }
+
+    function finishTrialSection() {
+        isRunning = false;
+        clearInterval(timerId);
+        currentIdx++;
+
+        if (currentIdx < SECTIONS.length) {
+            goToInstructions();
+        } else {
+            completeExperiment();
+        }
+    }
+
+    async function completeExperiment() {
+        switchScreen('screen-end');
+        document.getElementById('end-id-display').innerText = participantId;
+
+        const stroop3v4 = scores.s3.correct - scores.s4.correct;
+        const stroop5v6 = scores.s5.correct - scores.s6.correct;
+
+        const tbody = document.getElementById('results-tbody');
+        tbody.innerHTML = "";
+        SECTIONS.forEach(sec => {
+            const s = scores[`s${sec.num}`];
+            tbody.innerHTML += `
+                <tr>
+                    <td><strong>Del ${sec.num}</strong></td>
+                    <td>${sec.label}</td>
+                    <td>${s.answered}</td>
+                    <td style="color:#16a34a; font-weight:bold;">${s.correct}</td>
+                    <td style="color:#dc2626;">${s.incorrect}</td>
+                </tr>
+            `;
+        });
+
+        document.getElementById('stroop-results-box').innerHTML = `
+            <strong>Stroop-effekt (Kongruent rätt − Inkongruent rätt):</strong><br>
+            • <strong>Omgång 1 (Del 3 vs Del 4):</strong> ${stroop3v4} poäng (${scores.s3.correct} − ${scores.s4.correct})<br>
+            • <strong>Omgång 2 (Del 5 vs Del 6):</strong> ${stroop5v6} poäng (${scores.s5.correct} − ${scores.s6.correct})
+        `;
+
+        const record = {
+            participant_id: participantId,
+            s1_answered: scores.s1.answered, s1_correct: scores.s1.correct, s1_incorrect: scores.s1.incorrect,
+            s2_answered: scores.s2.answered, s2_correct: scores.s2.correct, s2_incorrect: scores.s2.incorrect,
+            s3_answered: scores.s3.answered, s3_correct: scores.s3.correct, s3_incorrect: scores.s3.incorrect,
+            s4_answered: scores.s4.answered, s4_correct: scores.s4.correct, s4_incorrect: scores.s4.incorrect,
+            s5_answered: scores.s5.answered, s5_correct: scores.s5.correct, s5_incorrect: scores.s5.incorrect,
+            s6_answered: scores.s6.answered, s6_correct: scores.s6.correct, s6_incorrect: scores.s6.incorrect,
+            stroop_effect_3_vs_4: stroop3v4,
+            stroop_effect_5_vs_6: stroop5v6
+        };
+
+        const { error } = await db.from('stroop_experiment').insert([record]);
+        const statusEl = document.getElementById('db-status');
+
+        if (error) {
+            console.error("Supabase error:", error);
+            statusEl.innerText = "Kunde inte spara till databasen. Ta en skärmdump av dina resultat nedan!";
+            statusEl.style.color = "#dc2626";
+        } else {
+            statusEl.innerText = "✓ Dina resultat har sparats i databasen!";
+            statusEl.style.color = "#16a34a";
+        }
+    }
+</script>
+</body>
+</html>
