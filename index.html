@@ -186,50 +186,51 @@
         { name: 'GUL', hex: '#eab308' }
     ];
 
-    const SECTIONS = [
+        const SECTIONS = [
         {
             num: 1,
             label: 'Konstant färg (Svart)',
             title: 'Del 1 av 6',
-            instruction: 'I den här delen är textfärgen alltid <strong>SVART</strong>, medan orden ändras.<br><br>Klicka på knappen som motsvarar <strong>ORDET</strong> som står skrivet.',
+            instruction: 'Texten är alltid <strong>SVART</strong>.<br><br>👉 Klicka på <strong>ORDET</strong> som står skrivet.',
             mode: 'constant_color'
         },
         {
             num: 2,
             label: 'Konstant ord (FÄRG)',
             title: 'Del 2 av 6',
-            instruction: 'I den här delen står det alltid ordet <strong>FÄRG</strong>, medan textfärgen ändras.<br><br>Klicka på knappen som motsvarar <strong>TEXTFÄRGEN</strong>.',
+            instruction: 'Nu står det alltid <strong>FÄRG</strong>.<br><br>👉 Klicka på <strong>TEXTFÄRGEN</strong> (inte ordet).',
             mode: 'constant_word'
         },
         {
             num: 3,
             label: 'Kongruent 1',
             title: 'Del 3 av 6',
-            instruction: 'Nu stämmer ordet och textfärgen överens (t.ex. ordet RÖD skrivet i röd färg).<br><br>Klicka på knappen som motsvarar <strong>TEXTFÄRGEN</strong>.',
+            instruction: 'Ord och textfärg <strong>stämmer överens</strong>.<br><br>👉 Klicka på <strong>TEXTFÄRGEN</strong>.',
             mode: 'congruent'
         },
         {
             num: 4,
             label: 'Inkongruent 1',
             title: 'Del 4 av 6',
-            instruction: 'Nu stämmer ordet och textfärgen <strong>INTE</strong> överens (t.ex. ordet RÖD skrivet i blå färg).<br><br>Ignorera vad det står och klicka på <strong>TEXTFÄRGEN</strong>.',
+            instruction: 'Ord och textfärg stämmer <strong>INTE</strong> överens!<br><br>👉 Ignorera ordet – klicka på <strong>TEXTFÄRGEN</strong>.',
             mode: 'incongruent'
         },
         {
             num: 5,
             label: 'Kongruent 2',
             title: 'Del 5 av 6',
-            instruction: 'Precis som i del 3 stämmer ordet och textfärgen nu överens igen.<br><br>Klicka på knappen som motsvarar <strong>TEXTFÄRGEN</strong>.',
+            instruction: 'Ord och textfärg <strong>stämmer överens</strong> igen.<br><br>👉 Klicka på <strong>TEXTFÄRGEN</strong>.',
             mode: 'congruent'
         },
         {
             num: 6,
             label: 'Inkongruent 2',
             title: 'Del 6 av 6',
-            instruction: 'Sista delen! Precis som i del 4 stämmer ordet och textfärgen <strong>INTE</strong> överens.<br><br>Ignorera ordet och klicka på <strong>TEXTFÄRGEN</strong>.',
+            instruction: 'Sista delen! Ord och textfärg stämmer <strong>INTE</strong> överens.<br><br>👉 Ignorera ordet – klicka på <strong>TEXTFÄRGEN</strong>.',
             mode: 'incongruent'
         }
     ];
+
     // =========================================================
     // 3. GENERATE PARTICIPANT ID
     // =========================================================
