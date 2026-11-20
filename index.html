@@ -397,10 +397,19 @@
                 '</tr>';
         });
 
+                const predictedCW = (scores.s1.correct + scores.s2.correct) > 0
+            ? (scores.s1.correct * scores.s2.correct) / (scores.s1.correct + scores.s2.correct)
+            : 0;
+        const goldenIG1 = (scores.s4.correct - predictedCW).toFixed(2);
+        const goldenIG2 = (scores.s6.correct - predictedCW).toFixed(2);
+
         document.getElementById('stroop-results-box').innerHTML =
-            '<strong>Stroop-effekt (Kongruent rätt − Inkongruent rätt):</strong><br>' +
-            '• <strong>Omgång 1 (Del 3 vs Del 4):</strong> ' + stroop3vs4 + ' poäng (' + scores.s3.correct + ' − ' + scores.s4.correct + ')<br>' +
-            '• <strong>Omgång 2 (Del 5 vs Del 6):</strong> ' + stroop5vs6 + ' poäng (' + scores.s5.correct + ' − ' + scores.s6.correct + ')';
+            '<strong>Stroop-interferens (Goldens standardformel):</strong><br>' +
+            '• <strong>Förväntat basvärde (P<sub>CW</sub>):</strong> ' + predictedCW.toFixed(2) + ' poäng<br>' +
+            '• <strong>Omgång 1 (Del 4 vs baslinje):</strong> ' + goldenIG1 + ' poäng<br>' +
+            '• <strong>Omgång 2 (Del 6 vs baslinje):</strong> ' + goldenIG2 + ' poäng<br>' +
+            '<span style="font-size:0.85rem;color:#64748b;">(Negativt värde = starkare Stroop-interferens; rådifferens Kongruent−Inkongruent: ' + stroop3vs4 + ' resp. ' + stroop5vs6 + ')</span>';
+
 
         const statusEl = document.getElementById('db-status');
 
