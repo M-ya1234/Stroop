@@ -418,12 +418,25 @@
         const goldenIG1 = (scores.s4.correct - predictedCW).toFixed(2);
         const goldenIG2 = (scores.s6.correct - predictedCW).toFixed(2);
 
+                const avgIG = ((parseFloat(goldenIG1) + parseFloat(goldenIG2)) / 2).toFixed(1);
+        const markerPos = Math.max(5, Math.min(95, ((parseFloat(avgIG) + 15) / 30) * 100));
+
         document.getElementById('stroop-results-box').innerHTML =
-            '<strong>Stroop-interferens (Goldens standardformel):</strong><br>' +
-            '• <strong>Förväntat basvärde (P<sub>CW</sub>):</strong> ' + predictedCW.toFixed(2) + ' poäng<br>' +
-            '• <strong>Omgång 1 (Del 4 vs baslinje):</strong> ' + goldenIG1 + ' poäng<br>' +
-            '• <strong>Omgång 2 (Del 6 vs baslinje):</strong> ' + goldenIG2 + ' poäng<br>' +
-            '<span style="font-size:0.85rem;color:#64748b;">(Negativt värde = starkare Stroop-interferens; rådifferens Kongruent−Inkongruent: ' + stroop3vs4 + ' resp. ' + stroop5vs6 + ')</span>';
+            '<strong>Din Stroop-effekt (Snitt: ' + (avgIG > 0 ? '+' + avgIG : avgIG) + ' poäng):</strong><br>' +
+            '• <strong>Förväntat resultat:</strong> ' + predictedCW.toFixed(1) + ' poäng<br>' +
+            '• <strong>Omgång 1:</strong> ' + goldenIG1 + ' poäng &nbsp;|&nbsp; <strong>Omgång 2:</strong> ' + goldenIG2 + ' poäng<br>' +
+            '<div style="margin:14px 0 6px 0;">' +
+                '<div style="display:flex;justify-content:space-between;font-size:0.8rem;font-weight:700;margin-bottom:4px;">' +
+                    '<span style="color:#dc2626;">Svårare (−10)</span>' +
+                    '<span style="color:#64748b;">Normalt (0)</span>' +
+                    '<span style="color:#16a34a;">Extra bra (+10)</span>' +
+                '</div>' +
+                '<div style="position:relative;height:12px;border-radius:99px;background:linear-gradient(90deg,#fca5a5 0%,#fde047 50%,#86efac 100%);">' +
+                    '<div style="position:absolute;top:-4px;left:' + markerPos + '%;transform:translateX(-50%);width:20px;height:20px;border-radius:50%;background:#1e293b;border:3px solid #ffffff;box-shadow:0 2px 5px rgba(0,0,0,0.3);"></div>' +
+                '</div>' +
+            '</div>' +
+            '<span style="font-size:0.85rem;color:#475569;"><strong>Vad betyder siffrorna?</strong> Ett <strong>minusvärde</strong> (t.ex. −5) betyder att texten störde hjärnan, <strong>0</strong> är normalt, och ett <strong>plusvärde</strong> (t.ex. +5) betyder att du stod emot distraktionen extra bra!</span>';
+
 
 
         const statusEl = document.getElementById('db-status');
