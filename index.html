@@ -464,8 +464,9 @@
                 s6_answered: scores.s6.answered,
                 s6_correct: scores.s6.correct,
                 s6_incorrect: scores.s6.incorrect,
-                stroop_effect_3_vs_4: stroop3vs4,
-                stroop_effect_5_vs_6: stroop5vs6
+                stroop_effect_3_vs_4: parseFloat(goldenIG1),
+                stroop_effect_5_vs_6: parseFloat(goldenIG2)
+
             };
 
             const { error } = await db.from('stroop_experiment').insert([payload]);
