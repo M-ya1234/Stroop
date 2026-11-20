@@ -269,12 +269,27 @@
         document.getElementById(screenId).classList.remove('hidden');
     }
 
-    function goToInstructions() {
+        function goToInstructions() {
         const sec = SECTIONS[currentIdx];
         document.getElementById('inst-header').innerText = sec.title;
         document.getElementById('inst-body').innerHTML = sec.instruction;
+
+        const btn = document.getElementById('btn-begin-section');
+        btn.disabled = true;
+        btn.style.opacity = '0.5';
+        btn.style.cursor = 'not-allowed';
+        btn.innerText = 'Läs instruktionerna (2s)...';
+
         showScreen('screen-instructions');
+
+        setTimeout(function() {
+            btn.disabled = false;
+            btn.style.opacity = '1';
+            btn.style.cursor = 'pointer';
+            btn.innerText = 'Jag har läst instruktionerna – Starta';
+        }, 2000);
     }
+
 
     function startSection() {
         const sec = SECTIONS[currentIdx];
